@@ -1,9 +1,10 @@
 import React from "react";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, DropResult } from "react-beautiful-dnd";
 import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { toDoState } from "./atoms";
 import Board from "./Components/Borad";
+import DeletePlace from "./Components/DeletePlace";
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,6 +27,16 @@ function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
   const dragEnd = (info: DropResult) => {
     const { destination, draggableId, source } = info;
+    console.log(info);
+    if (destination?.droppableId === "del") {
+      setToDos((allBoards) => {
+        const boardCopy = [...allBoards[source.droppableId]];
+        boardCopy.splice(source.index, 1);
+        return {
+          ...allBoards,
+        };
+      });
+    }
     if (!destination) return;
     if (destination?.droppableId === source.droppableId) {
       setToDos((allBoards) => {
@@ -62,6 +73,7 @@ function App() {
             <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
           ))}
         </Boards>
+        <DeletePlace />
       </Wrapper>
     </DragDropContext>
   );
